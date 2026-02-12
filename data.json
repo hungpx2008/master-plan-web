@@ -68,7 +68,7 @@
     "name": "Security review – chốt yêu cầu",
     "owner": "Joint",
     "start": "2026-02-23",
-    "end": "2026-03-13",
+    "end": "2026-03-04",
     "deliverable": "Security freeze (auth, token, IP, signature)",
     "dependency": "P0-01",
     "critical": true,
