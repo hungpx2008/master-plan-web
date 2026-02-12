@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tích hợp API ContainerGo – SNP ePort | Project Tracker</title>
+    <meta name="description" content="Theo dõi tiến độ dự án tích hợp API ContainerGo – SNP ePort.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app">
+        <!-- ═══════════ (A) HEADER ═══════════ -->
+        <header class="header">
+            <div class="header-inner">
+                <div class="header-left">
+                    <div class="badge-status"><span class="pulse"></span>Đang triển khai</div>
+                    <h1 class="project-title">Tích hợp API ContainerGo – SNP ePort</h1>
+                    <div class="project-meta">
+                        <span class="meta-item">📍 <strong>Phạm vi:</strong> Cảng Cát Lái – Hàng nhập - Hàng Xuất</span>
+                        <span class="meta-divider">|</span>
+                        <span class="meta-item">📅 <strong>Timeline:</strong> <span id="header-timeline">Hôm nay →
+                                31/03/2026</span></span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <!-- Admin toggle -->
+                    <button class="admin-toggle" id="admin-toggle" title="Đăng nhập Admin">
+                        🔒 <span id="admin-label">Chế độ xem</span>
+                    </button>
+                    <div class="legend">
+                        <div class="legend-item"><span class="legend-dot cogo"></span>CoGo</div>
+                        <div class="legend-item"><span class="legend-dot snp"></span>SNP</div>
+                        <div class="legend-item"><span class="legend-dot joint"></span>Phối hợp</div>
+                        <div class="legend-item"><span class="legend-dot critical"></span>Critical</div>
+                        <div class="legend-item"><span class="legend-dot holiday"></span>Nghỉ Tết</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ═══════════ (B) MILESTONES ═══════════ -->
+        <section class="milestones-section">
+            <div class="milestones-track" id="milestones-track"></div>
+        </section>
+
+        <!-- ═══════════ (C) CONTROLS ═══════════ -->
+        <div class="controls-bar">
+            <div class="filters" id="filters">
+                <button class="filter-btn active" data-filter="all">Tất cả</button>
+                <button class="filter-btn" data-filter="cogo">CoGo</button>
+                <button class="filter-btn" data-filter="snp">SNP</button>
+                <button class="filter-btn" data-filter="joint">Phối hợp</button>
+                <button class="filter-btn" data-filter="critical">Critical Path</button>
+            </div>
+            <div class="controls-right">
+                <!-- Admin tools -->
+                <button class="btn-admin-tool hidden" id="btn-download-template">📥 Tải template</button>
+                <button class="btn-admin-tool hidden" id="btn-import-json">📤 Import JSON</button>
+                <input type="file" id="import-file-input" accept=".json" class="hidden">
+                <button class="btn-add-task hidden" id="btn-add-task">➕ Thêm task</button>
+                <span class="task-count" id="task-count">24 tasks</span>
+            </div>
+        </div>
+
+        <!-- ═══════════ (D) GANTT CHART ═══════════ -->
+        <main class="gantt-area" id="gantt-area">
+            <div class="gantt-scroll-wrapper" id="gantt-scroll">
+                <div class="gantt-sidebar" id="gantt-sidebar">
+                    <div class="sidebar-header">Công việc</div>
+                    <div class="sidebar-body" id="sidebar-body"></div>
+                </div>
+                <div class="gantt-timeline" id="gantt-timeline">
+                    <div class="timeline-header" id="timeline-header"></div>
+                    <div class="timeline-body" id="timeline-body">
+                        <div class="holiday-overlay" id="holiday-overlay">
+                            <span class="holiday-label">Nghỉ Tết Âm lịch – Không triển khai</span>
+                        </div>
+                        <div class="today-marker" id="today-marker">
+                            <span class="today-label">Hôm nay</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- TOOLTIP -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <!-- MODAL – Task Detail / Edit -->
+    <div class="modal-backdrop" id="modal-backdrop">
+        <div class="modal" id="modal">
+            <button class="modal-close" id="modal-close">&times;</button>
+            <div class="modal-header">
+                <span class="modal-id" id="modal-id">P0-01</span>
+                <h2 class="modal-title" id="modal-title">Task Name</h2>
+            </div>
+            <div class="modal-body">
+                <div class="modal-info-grid">
+                    <div class="info-cell">
+                        <span class="info-label">Owner</span>
+                        <span class="info-value readonly" id="modal-owner">—</span>
+                        <select class="info-edit hidden" id="modal-owner-edit">
+                            <option value="CoGo">CoGo</option>
+                            <option value="SNP">SNP</option>
+                            <option value="Joint">Phối hợp</option>
+                        </select>
+                    </div>
+                    <div class="info-cell">
+                        <span class="info-label">Thời gian</span>
+                        <span class="info-value readonly" id="modal-dates">—</span>
+                        <div class="date-edit hidden" id="modal-dates-edit">
+                            <input type="date" id="modal-start-date">
+                            <span>→</span>
+                            <input type="date" id="modal-end-date">
+                        </div>
+                    </div>
+                    <div class="info-cell">
+                        <span class="info-label">Phụ thuộc</span>
+                        <span class="info-value readonly" id="modal-dep">—</span>
+                        <input class="info-edit hidden" id="modal-dep-edit" type="text" placeholder="e.g. P0-01">
+                    </div>
+                    <div class="info-cell full">
+                        <span class="info-label">Đầu ra (Deliverable)</span>
+                        <span class="info-value readonly" id="modal-deliverable">—</span>
+                        <input class="info-edit hidden" id="modal-deliverable-edit" type="text">
+                    </div>
+                    <div class="info-cell full">
+                        <span class="info-label">Tên công việc</span>
+                        <span class="info-value readonly" id="modal-name-display">—</span>
+                        <input class="info-edit hidden" id="modal-name-edit" type="text">
+                    </div>
+                </div>
+                <hr class="modal-divider">
+                <div class="modal-edit-row">
+                    <label class="edit-label" for="modal-status">Trạng thái</label>
+                    <select id="modal-status" class="edit-select" disabled>
+                        <option value="Planned">Chưa bắt đầu</option>
+                        <option value="In Progress">Đang thực hiện</option>
+                        <option value="Done">Hoàn thành</option>
+                        <option value="Blocked">Bị chặn</option>
+                        <option value="Late">Trễ</option>
+                    </select>
+                </div>
+                <div class="modal-edit-row">
+                    <label class="edit-label" for="modal-progress">Tiến độ</label>
+                    <div class="progress-control">
+                        <input type="range" id="modal-progress" min="0" max="100" value="0" disabled>
+                        <span class="progress-value" id="modal-progress-val">0%</span>
+                    </div>
+                </div>
+                <div class="modal-edit-row">
+                    <label class="edit-label">Critical Path</label>
+                    <label class="toggle-switch hidden" id="modal-critical-toggle">
+                        <input type="checkbox" id="modal-critical">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="readonly" id="modal-critical-display">—</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-delete hidden" id="btn-delete">🗑️ Xóa task</button>
+                <div class="modal-footer-right">
+                    <button class="btn-cancel" id="btn-cancel">Đóng</button>
+                    <button class="btn-save hidden" id="btn-save">💾 Lưu thay đổi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN LOGIN MODAL -->
+    <div class="modal-backdrop" id="admin-modal-backdrop">
+        <div class="modal admin-modal">
+            <button class="modal-close" id="admin-modal-close">&times;</button>
+            <div class="modal-header">
+                <h2 class="modal-title">🔐 Đăng nhập Admin</h2>
+            </div>
+            <div class="modal-body">
+                <div class="modal-edit-row">
+                    <label class="edit-label" for="admin-password">Mật khẩu</label>
+                    <input type="password" id="admin-password" class="edit-input" placeholder="Nhập mật khẩu admin...">
+                    <p class="error-msg hidden" id="admin-error">❌ Sai mật khẩu!</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="admin-cancel">Hủy</button>
+                <button class="btn-save" id="admin-login-btn">🔓 Đăng nhập</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD TASK MODAL -->
+    <div class="modal-backdrop" id="add-task-backdrop">
+        <div class="modal">
+            <button class="modal-close" id="add-task-close">&times;</button>
+            <div class="modal-header">
+                <h2 class="modal-title">➕ Thêm Task Mới</h2>
+            </div>
+            <div class="modal-body">
+                <div class="modal-edit-row">
+                    <label class="edit-label">Mã task (ID)</label>
+                    <input type="text" id="new-task-id" class="edit-input" placeholder="VD: P1-SNP-07">
+                </div>
+                <div class="modal-edit-row">
+                    <label class="edit-label">Tên công việc</label>
+                    <input type="text" id="new-task-name" class="edit-input" placeholder="Tên task">
+                </div>
+                <div class="modal-edit-row">
+                    <label class="edit-label">Owner</label>
+                    <select id="new-task-owner" class="edit-select">
+                        <option value="CoGo">CoGo</option>
+                        <option value="SNP">SNP</option>
+                        <option value="Joint">Phối hợp</option>
+                    </select>
+                </div>
+                <div class="modal-edit-row">
+                    <label class="edit-label">Ngày bắt đầu</label>
+                    <input type="date" id="new-task-start" class="edit-input">
+                </div>
+                <div class="modal-edit-row">
+                    <label class="edit-label">Ngày kết thúc</label>
+                    <input type="date" id="new-task-end" class="edit-input">
+                </div>
+                <div class="modal-edit-row">
+                    <label class="edit-label">Deliverable</label>
+                    <input type="text" id="new-task-deliverable" class="edit-input" placeholder="Đầu ra">
+                </div>
+                <div class="modal-edit-row">
+                    <label class="edit-label">Dependency</label>
+                    <input type="text" id="new-task-dep" class="edit-input" placeholder="VD: P0-01">
+                </div>
+                <div class="modal-edit-row">
+                    <label class="edit-label">Critical</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="new-task-critical">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="add-task-cancel">Hủy</button>
+                <button class="btn-save" id="add-task-save">💾 Tạo task</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
