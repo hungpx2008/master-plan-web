@@ -1064,7 +1064,9 @@ async function loadFromGitHub() {
         const res = await fetch(url, { headers });
         if (!res.ok) return null;
         const json = await res.json();
-        const content = atob(json.content.replace(/\n/g, ''));
+        const raw = atob(json.content.replace(/\n/g, ''));
+        const bytes = new Uint8Array([...raw].map(c => c.charCodeAt(0)));
+        const content = new TextDecoder('utf-8').decode(bytes);
         return JSON.parse(content);
     } catch {
         return null;
