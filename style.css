@@ -383,6 +383,75 @@ body {
     background: rgba(37, 99, 235, .04);
 }
 
+.btn-admin-tool:disabled {
+    opacity: .4;
+    cursor: default;
+    pointer-events: none;
+}
+
+.btn-github-save {
+    padding: .35rem .85rem;
+    border: 1px solid var(--c-done);
+    background: rgba(22, 163, 74, .06);
+    color: var(--c-done);
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+}
+
+.btn-github-save:hover {
+    background: var(--c-done);
+    color: #fff;
+}
+
+.btn-github-save.has-changes {
+    animation: pulse-green 1.5s infinite;
+    border-color: var(--c-done);
+    box-shadow: 0 0 0 2px rgba(22, 163, 74, .15);
+}
+
+@keyframes pulse-green {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 2px rgba(22, 163, 74, .15);
+    }
+
+    50% {
+        box-shadow: 0 0 0 5px rgba(22, 163, 74, .08);
+    }
+}
+
+.btn-github-save.saving {
+    opacity: .7;
+    pointer-events: none;
+}
+
+.gh-status {
+    margin-top: .5rem;
+    padding: .5rem .75rem;
+    border-radius: var(--radius-sm);
+    font-size: .78rem;
+    display: none;
+}
+
+.gh-status.success {
+    display: block;
+    background: rgba(22, 163, 74, .08);
+    color: var(--c-done);
+    border: 1px solid rgba(22, 163, 74, .2);
+}
+
+.gh-status.error {
+    display: block;
+    background: rgba(220, 38, 38, .06);
+    color: var(--c-critical);
+    border: 1px solid rgba(220, 38, 38, .2);
+}
+
 /* ═══════ GANTT ═══════ */
 .gantt-area {
     flex: 1;

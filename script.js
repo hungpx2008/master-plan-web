@@ -15,6 +15,7 @@ const CFG = {
     dayWidth: 42,
     rowHeight: 44,
     storageKey: 'cogo_snp_gantt_v3',
+    ghSettingsKey: 'cogo_snp_gantt_gh',
 };
 
 // ─── Milestones ───
@@ -88,6 +89,9 @@ let tasks = [];
 let isAdmin = false;
 let activeFilter = 'all';
 let currentModalId = null;
+let undoHistory = [];
+let isDirty = false;
+const MAX_UNDO = 30;
 
 // DOM
 const $ = id => document.getElementById(id);
@@ -103,6 +107,7 @@ const $tooltip = $('tooltip');
 const $modalBackdrop = $('modal-backdrop');
 const $adminModalBackdrop = $('admin-modal-backdrop');
 const $addTaskBackdrop = $('add-task-backdrop');
+const $githubModalBackdrop = $('github-modal-backdrop');
 
 const allDates = generateDates(CFG.projectStart, CFG.projectEnd);
 const totalDays = allDates.length;
@@ -110,8 +115,8 @@ const totalDays = allDates.length;
 // ═══════════════════════
 // INIT
 // ═══════════════════════
-function init() {
-    loadTasks();
+async function init() {
+    await loadTasks();
     renderMilestones();
     renderDateHeader();
     renderOverlays();
@@ -120,19 +125,60 @@ function init() {
     updateAdminUI();
 }
 
-function loadTasks() {
+async function loadTasks() {
+    // Try GitHub first
+    const ghData = await loadFromGitHub();
+    if (ghData) {
+        tasks = ghData;
+        saveTasks(false); // cache locally without marking dirty
+        return;
+    }
+    // Fallback to localStorage
     const saved = localStorage.getItem(CFG.storageKey);
     if (saved) {
-        const parsed = JSON.parse(saved);
-        // Full data stored (including added tasks)
-        tasks = parsed;
+        tasks = JSON.parse(saved);
     } else {
         tasks = DEFAULT_TASKS.map(row => row.type ? { ...row } : { ...row, status: 'Planned', progress: 0 });
     }
 }
 
-function saveTasks() {
+function saveTasks(markAsDirty = true) {
     localStorage.setItem(CFG.storageKey, JSON.stringify(tasks));
+    if (markAsDirty) {
+        isDirty = true;
+        updateDirtyUI();
+    }
+}
+
+function pushUndo() {
+    undoHistory.push(JSON.stringify(tasks));
+    if (undoHistory.length > MAX_UNDO) undoHistory.shift();
+    updateUndoUI();
+}
+
+function undo() {
+    if (!undoHistory.length) return;
+    tasks = JSON.parse(undoHistory.pop());
+    saveTasks();
+    renderGantt();
+    renderMilestones();
+    updateUndoUI();
+}
+
+function updateUndoUI() {
+    const btn = $('btn-undo');
+    btn.disabled = undoHistory.length === 0;
+}
+
+function updateDirtyUI() {
+    const btn = $('btn-save-github');
+    if (isDirty) {
+        btn.classList.add('has-changes');
+        btn.textContent = '☁️ Lưu lên GitHub (•)';
+    } else {
+        btn.classList.remove('has-changes');
+        btn.textContent = '☁️ Lưu lên GitHub';
+    }
 }
 
 // ═══════════════════════
@@ -141,7 +187,7 @@ function saveTasks() {
 function updateAdminUI() {
     const lbl = $('admin-label');
     const btn = $('admin-toggle');
-    const adminEls = ['btn-add-task', 'btn-download-template', 'btn-import-json'];
+    const adminEls = ['btn-add-task', 'btn-download-template', 'btn-import-json', 'btn-undo', 'btn-save-github', 'btn-github-settings'];
 
     if (isAdmin) {
         lbl.textContent = 'Admin ✓';
@@ -437,6 +483,7 @@ function setupDragMove(bar, task) {
                 const dx = ev.clientX - startX;
                 const daysDelta = Math.round(dx / CFG.dayWidth);
                 if (daysDelta !== 0) {
+                    pushUndo();
                     const sd = parseDate(task.start);
                     const ed = parseDate(task.end);
                     sd.setDate(sd.getDate() + daysDelta);
@@ -496,6 +543,7 @@ function setupDragResize(handle, task, side) {
             const daysDelta = Math.round(dx / CFG.dayWidth);
 
             if (daysDelta !== 0) {
+                pushUndo();
                 if (side === 'right') {
                     const newDuration = Math.max(1, origDuration + daysDelta);
                     const ed = new Date(startDate);
@@ -621,6 +669,7 @@ function saveModal() {
     const task = tasks.find(t => t.id === currentModalId);
     if (!task) return;
 
+    pushUndo();
     task.status = $('modal-status').value;
     task.progress = Number($('modal-progress').value);
     task.owner = $('modal-owner-edit').value;
@@ -643,6 +692,7 @@ function deleteTask() {
     if (!task) return;
     if (!confirm(`Bạn có chắc muốn xóa task "${task.name}" (${task.id})?`)) return;
 
+    pushUndo();
     const idx = tasks.indexOf(task);
     if (idx !== -1) tasks.splice(idx, 1);
 
@@ -732,6 +782,7 @@ function saveNewTask() {
         }
     }
 
+    pushUndo();
     tasks.splice(insertIdx, 0, newTask);
 
     saveTasks();
@@ -837,6 +888,7 @@ function handleImportFile(e) {
             }
 
             // Smart insert each task by prefix
+            pushUndo();
             const getPrefix = (taskId) => {
                 const parts = taskId.split('-');
                 if (parts.length >= 3) return parts.slice(0, 2).join('-');
@@ -931,6 +983,17 @@ function bindEvents() {
     $('import-file-input').addEventListener('change', handleImportFile);
     $addTaskBackdrop.addEventListener('click', e => { if (e.target === $addTaskBackdrop) $addTaskBackdrop.classList.remove('open'); });
 
+    // Undo
+    $('btn-undo').addEventListener('click', undo);
+
+    // GitHub
+    $('btn-save-github').addEventListener('click', saveToGitHub);
+    $('btn-github-settings').addEventListener('click', openGitHubSettings);
+    $('github-modal-close').addEventListener('click', () => $githubModalBackdrop.classList.remove('open'));
+    $('gh-cancel').addEventListener('click', () => $githubModalBackdrop.classList.remove('open'));
+    $('gh-save-settings').addEventListener('click', saveGitHubSettings);
+    $githubModalBackdrop.addEventListener('click', e => { if (e.target === $githubModalBackdrop) $githubModalBackdrop.classList.remove('open'); });
+
     // Sync scroll
     const timeline = $('gantt-timeline');
     const sidebar = $('sidebar-body');
@@ -943,8 +1006,128 @@ function bindEvents() {
             closeModal();
             $adminModalBackdrop.classList.remove('open');
             $addTaskBackdrop.classList.remove('open');
+            $githubModalBackdrop.classList.remove('open');
         }
     });
+
+    // Ctrl+Z undo
+    document.addEventListener('keydown', e => {
+        if (e.ctrlKey && e.key === 'z' && isAdmin) { e.preventDefault(); undo(); }
+    });
+}
+
+// ═══════════════════════
+// GITHUB SYNC
+// ═══════════════════════
+function getGitHubSettings() {
+    const saved = localStorage.getItem(CFG.ghSettingsKey);
+    if (saved) return JSON.parse(saved);
+    return {
+        token: '',
+        repo: 'hungpx2008/master-plan-web',
+        branch: 'main',
+        filepath: 'data.json',
+    };
+}
+
+function openGitHubSettings() {
+    const s = getGitHubSettings();
+    $('gh-token').value = s.token;
+    $('gh-repo').value = s.repo;
+    $('gh-branch').value = s.branch;
+    $('gh-filepath').value = s.filepath;
+    $('gh-status').className = 'gh-status';
+    $('gh-status').textContent = '';
+    $githubModalBackdrop.classList.add('open');
+}
+
+function saveGitHubSettings() {
+    const settings = {
+        token: $('gh-token').value.trim(),
+        repo: $('gh-repo').value.trim(),
+        branch: $('gh-branch').value.trim(),
+        filepath: $('gh-filepath').value.trim(),
+    };
+    localStorage.setItem(CFG.ghSettingsKey, JSON.stringify(settings));
+    $('gh-status').className = 'gh-status success';
+    $('gh-status').textContent = '✅ Đã lưu cài đặt!';
+    setTimeout(() => $githubModalBackdrop.classList.remove('open'), 800);
+}
+
+async function loadFromGitHub() {
+    const s = getGitHubSettings();
+    if (!s.repo || !s.filepath) return null;
+    try {
+        const url = `https://api.github.com/repos/${s.repo}/contents/${s.filepath}?ref=${s.branch}&t=${Date.now()}`;
+        const headers = { 'Accept': 'application/vnd.github.v3+json' };
+        if (s.token) headers['Authorization'] = `Bearer ${s.token}`;
+        const res = await fetch(url, { headers });
+        if (!res.ok) return null;
+        const json = await res.json();
+        const content = atob(json.content.replace(/\n/g, ''));
+        return JSON.parse(content);
+    } catch {
+        return null;
+    }
+}
+
+async function saveToGitHub() {
+    const s = getGitHubSettings();
+    if (!s.token) {
+        alert('Chưa có GitHub Token. Vui lòng vào ⚙️ Cài đặt để nhập token.');
+        openGitHubSettings();
+        return;
+    }
+
+    const btn = $('btn-save-github');
+    btn.classList.add('saving');
+    btn.textContent = '☁️ Đang lưu...';
+
+    try {
+        // Get current file SHA (needed for update)
+        const getUrl = `https://api.github.com/repos/${s.repo}/contents/${s.filepath}?ref=${s.branch}`;
+        const headers = {
+            'Accept': 'application/vnd.github.v3+json',
+            'Authorization': `Bearer ${s.token}`,
+        };
+
+        let sha = '';
+        const getRes = await fetch(getUrl, { headers });
+        if (getRes.ok) {
+            const getJson = await getRes.json();
+            sha = getJson.sha;
+        }
+
+        // Commit updated data
+        const content = btoa(unescape(encodeURIComponent(JSON.stringify(tasks, null, 2))));
+        const putUrl = `https://api.github.com/repos/${s.repo}/contents/${s.filepath}`;
+        const body = {
+            message: `[Gantt] Update tasks - ${new Date().toLocaleString('vi-VN')}`,
+            content,
+            branch: s.branch,
+        };
+        if (sha) body.sha = sha;
+
+        const putRes = await fetch(putUrl, {
+            method: 'PUT',
+            headers: { ...headers, 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+
+        if (putRes.ok) {
+            isDirty = false;
+            updateDirtyUI();
+            btn.classList.remove('saving');
+            alert('✅ Đã lưu lên GitHub thành công!');
+        } else {
+            const err = await putRes.json();
+            throw new Error(err.message || 'API error');
+        }
+    } catch (err) {
+        btn.classList.remove('saving');
+        updateDirtyUI();
+        alert('❌ Lỗi lưu lên GitHub: ' + err.message);
+    }
 }
 
 // ─── GO ───

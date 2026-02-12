@@ -60,10 +60,13 @@
             </div>
             <div class="controls-right">
                 <!-- Admin tools -->
+                <button class="btn-admin-tool hidden" id="btn-undo" disabled>↩️ Hoàn tác</button>
                 <button class="btn-admin-tool hidden" id="btn-download-template">📥 Tải template</button>
                 <button class="btn-admin-tool hidden" id="btn-import-json">📤 Import JSON</button>
                 <input type="file" id="import-file-input" accept=".json" class="hidden">
                 <button class="btn-add-task hidden" id="btn-add-task">➕ Thêm task</button>
+                <button class="btn-github-save hidden" id="btn-save-github">☁️ Lưu lên GitHub</button>
+                <button class="btn-admin-tool hidden" id="btn-github-settings" title="Cài đặt GitHub">⚙️</button>
                 <span class="task-count" id="task-count">24 tasks</span>
             </div>
         </div>
@@ -246,6 +249,42 @@
             <div class="modal-footer">
                 <button class="btn-cancel" id="add-task-cancel">Hủy</button>
                 <button class="btn-save" id="add-task-save">💾 Tạo task</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GITHUB SETTINGS MODAL -->
+    <div class="modal-backdrop" id="github-modal-backdrop">
+        <div class="modal" style="max-width:460px">
+            <div class="modal-header">
+                <h2>⚙️ Cài đặt GitHub Sync</h2>
+                <button class="modal-close" id="github-modal-close">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-edit-row">
+                    <label class="edit-label">GitHub Token</label>
+                    <input type="password" class="edit-input" id="gh-token" placeholder="ghp_xxxx...">
+                </div>
+                <div class="modal-edit-row">
+                    <label class="edit-label">Repository (owner/repo)</label>
+                    <input type="text" class="edit-input" id="gh-repo" value="hungpx2008/master-plan-web">
+                </div>
+                <div class="modal-edit-row">
+                    <label class="edit-label">Branch</label>
+                    <input type="text" class="edit-input" id="gh-branch" value="main">
+                </div>
+                <div class="modal-edit-row">
+                    <label class="edit-label">File path</label>
+                    <input type="text" class="edit-input" id="gh-filepath" value="data.json">
+                </div>
+                <div id="gh-status" class="gh-status"></div>
+            </div>
+            <div class="modal-footer">
+                <div></div>
+                <div class="modal-footer-right">
+                    <button class="btn-cancel" id="gh-cancel">Đóng</button>
+                    <button class="btn-save" id="gh-save-settings">💾 Lưu cài đặt</button>
+                </div>
             </div>
         </div>
     </div>
