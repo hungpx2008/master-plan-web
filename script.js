@@ -4,7 +4,7 @@
    ═══════════════════════════════════════ */
 
 // ─── Admin Password (hardcoded) ───
-const ADMIN_PASSWORD = 'admin@cogo2026';
+const ADMIN_PASSWORD = 'admin@2026';
 
 // ─── Configuration ───
 const CFG = {
