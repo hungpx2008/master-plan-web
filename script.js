@@ -108,6 +108,8 @@ const $modalBackdrop = $('modal-backdrop');
 const $adminModalBackdrop = $('admin-modal-backdrop');
 const $addTaskBackdrop = $('add-task-backdrop');
 const $githubModalBackdrop = $('github-modal-backdrop');
+const $pmModalBackdrop = $('pm-modal-backdrop');
+let currentPmIndex = null;
 
 const allDates = generateDates(CFG.projectStart, CFG.projectEnd);
 const totalDays = allDates.length;
@@ -349,6 +351,14 @@ function addPhaseRow(label) {
     const sRow = document.createElement('div');
     sRow.className = 'sidebar-row phase-header';
     sRow.textContent = label;
+    if (isAdmin) {
+        sRow.style.cursor = 'pointer';
+        sRow.title = 'Click để chỉnh sửa';
+        sRow.addEventListener('click', () => {
+            const idx = tasks.findIndex(t => t.type === 'phase' && t.label === label);
+            if (idx !== -1) openPmModal(idx);
+        });
+    }
     $sidebarBody.appendChild(sRow);
 
     const tRow = document.createElement('div');
@@ -360,6 +370,14 @@ function addMilestoneRow(ms) {
     const sRow = document.createElement('div');
     sRow.className = 'sidebar-row milestone-row';
     sRow.innerHTML = `<span style="margin-right:.3rem">◆</span>${ms.label}`;
+    if (isAdmin) {
+        sRow.style.cursor = 'pointer';
+        sRow.title = 'Click để chỉnh sửa';
+        sRow.addEventListener('click', () => {
+            const idx = tasks.findIndex(t => t.type === 'milestone' && t.id === ms.id);
+            if (idx !== -1) openPmModal(idx);
+        });
+    }
     $sidebarBody.appendChild(sRow);
 
     const tRow = document.createElement('div');
@@ -994,6 +1012,12 @@ function bindEvents() {
     $('gh-save-settings').addEventListener('click', saveGitHubSettings);
     $githubModalBackdrop.addEventListener('click', e => { if (e.target === $githubModalBackdrop) $githubModalBackdrop.classList.remove('open'); });
 
+    // Phase/Milestone edit modal
+    $('pm-modal-close').addEventListener('click', () => $pmModalBackdrop.classList.remove('open'));
+    $('pm-cancel').addEventListener('click', () => $pmModalBackdrop.classList.remove('open'));
+    $('pm-save').addEventListener('click', savePmModal);
+    $pmModalBackdrop.addEventListener('click', e => { if (e.target === $pmModalBackdrop) $pmModalBackdrop.classList.remove('open'); });
+
     // Sync scroll
     const timeline = $('gantt-timeline');
     const sidebar = $('sidebar-body');
@@ -1007,6 +1031,7 @@ function bindEvents() {
             $adminModalBackdrop.classList.remove('open');
             $addTaskBackdrop.classList.remove('open');
             $githubModalBackdrop.classList.remove('open');
+            $pmModalBackdrop.classList.remove('open');
         }
     });
 
@@ -1014,6 +1039,40 @@ function bindEvents() {
     document.addEventListener('keydown', e => {
         if (e.ctrlKey && e.key === 'z' && isAdmin) { e.preventDefault(); undo(); }
     });
+}
+
+// ═══════════════════════
+// PHASE / MILESTONE EDIT
+// ═══════════════════════
+function openPmModal(index) {
+    if (!isAdmin) return;
+    currentPmIndex = index;
+    const item = tasks[index];
+    if (item.type === 'phase') {
+        $('pm-modal-title').textContent = '✏️ Chỉnh sửa Phase';
+        $('pm-label').value = item.label;
+        $('pm-date-row').style.display = 'none';
+    } else if (item.type === 'milestone') {
+        $('pm-modal-title').textContent = '✏️ Chỉnh sửa Milestone';
+        $('pm-label').value = item.label;
+        $('pm-date').value = item.date;
+        $('pm-date-row').style.display = '';
+    }
+    $pmModalBackdrop.classList.add('open');
+}
+
+function savePmModal() {
+    if (currentPmIndex === null) return;
+    const item = tasks[currentPmIndex];
+    pushUndo();
+    item.label = $('pm-label').value.trim();
+    if (item.type === 'milestone' && $('pm-date').value) {
+        item.date = $('pm-date').value;
+    }
+    saveTasks();
+    renderGantt();
+    $pmModalBackdrop.classList.remove('open');
+    currentPmIndex = null;
 }
 
 // ═══════════════════════

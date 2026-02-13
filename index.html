@@ -289,6 +289,33 @@
         </div>
     </div>
 
+    <!-- PHASE / MILESTONE EDIT MODAL -->
+    <div class="modal-backdrop" id="pm-modal-backdrop">
+        <div class="modal" style="max-width:460px">
+            <div class="modal-header">
+                <h2 id="pm-modal-title">Chỉnh sửa</h2>
+                <button class="modal-close" id="pm-modal-close">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-edit-row">
+                    <label class="edit-label">Tên hiển thị</label>
+                    <input type="text" class="edit-input" id="pm-label">
+                </div>
+                <div class="modal-edit-row" id="pm-date-row" style="display:none">
+                    <label class="edit-label">Ngày</label>
+                    <input type="date" class="edit-input" id="pm-date">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div></div>
+                <div class="modal-footer-right">
+                    <button class="btn-cancel" id="pm-cancel">Hủy</button>
+                    <button class="btn-save" id="pm-save">💾 Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 
