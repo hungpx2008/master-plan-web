@@ -20,9 +20,9 @@ const CFG = {
 
 // ─── Milestones ───
 const MILESTONES = [
-    { id: 'M0', name: 'Spec & Security Freeze', date: '2026-02-13' },
-    { id: 'M1', name: 'Dev Complete', date: '2026-03-13' },
-    { id: 'M2', name: 'Integration Sign-off', date: '2026-03-20' },
+    { id: 'M0', name: 'Spec & Security Freeze', date: '2026-03-03' },
+    { id: 'M1', name: 'Dev Complete', date: '2026-03-19' },
+    { id: 'M2', name: 'Integration Sign-off', date: '2026-03-24' },
     { id: 'M3', name: 'UAT Sign-off', date: '2026-03-27' },
     { id: 'M4', name: 'Go-live', date: '2026-03-31' },
 ];
