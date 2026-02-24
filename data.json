@@ -37,7 +37,7 @@
     "dependency": "P0-02",
     "critical": true,
     "status": "Planned",
-    "progress": 0
+    "progress": 23
   },
   {
     "id": "P0-04",
@@ -73,7 +73,7 @@
     "dependency": "P0-01",
     "critical": true,
     "status": "Planned",
-    "progress": 0
+    "progress": 33
   },
   {
     "type": "milestone",
@@ -111,7 +111,7 @@
     "dependency": "M0",
     "critical": true,
     "status": "Planned",
-    "progress": 0
+    "progress": 10
   },
   {
     "id": "P1-SNP-03",
@@ -158,6 +158,54 @@
     "deliverable": "Webhook caller + retry + logging",
     "dependency": "P0-05",
     "critical": true,
+    "status": "Planned",
+    "progress": 0
+  },
+  {
+    "id": "P1-SNP-007",
+    "name": "API xác thực tài xế",
+    "owner": "SNP",
+    "start": "2026-03-05",
+    "end": "2026-03-09",
+    "deliverable": "—",
+    "dependency": "",
+    "critical": false,
+    "status": "Planned",
+    "progress": 0
+  },
+  {
+    "id": "P1-SNP-008",
+    "name": "API xác thực đầu kéo",
+    "owner": "SNP",
+    "start": "2026-03-07",
+    "end": "2026-03-10",
+    "deliverable": "—",
+    "dependency": "",
+    "critical": false,
+    "status": "Planned",
+    "progress": 0
+  },
+  {
+    "id": "P1-SNP-009",
+    "name": "API xác thực rơ-moóc",
+    "owner": "SNP",
+    "start": "2026-03-09",
+    "end": "2026-03-12",
+    "deliverable": "—",
+    "dependency": "",
+    "critical": false,
+    "status": "Planned",
+    "progress": 0
+  },
+  {
+    "id": "P1-SNP-010",
+    "name": "Service cập nhật trạng thái cho thông tin đăng ký check-in của CoGo",
+    "owner": "SNP",
+    "start": "2026-03-11",
+    "end": "2026-03-13",
+    "deliverable": "—",
+    "dependency": "",
+    "critical": false,
     "status": "Planned",
     "progress": 0
   },
