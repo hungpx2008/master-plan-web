@@ -12,7 +12,7 @@
     "deliverable": "Biên bản kickoff + scope confirm",
     "dependency": "",
     "critical": true,
-    "status": "Planned",
+    "status": "Done",
     "progress": 100
   },
   {
@@ -24,8 +24,8 @@
     "deliverable": "API list final (7 API + webhook)",
     "dependency": "P0-01",
     "critical": true,
-    "status": "Planned",
-    "progress": 94
+    "status": "Done",
+    "progress": 100
   },
   {
     "id": "P0-03",
@@ -36,7 +36,7 @@
     "deliverable": "Field mapping table v1.0",
     "dependency": "P0-02",
     "critical": true,
-    "status": "Planned",
+    "status": "In Progress",
     "progress": 23
   },
   {
@@ -48,7 +48,7 @@
     "deliverable": "Error code catalog v1.0",
     "dependency": "P0-02",
     "critical": true,
-    "status": "Planned",
+    "status": "In Progress",
     "progress": 0
   },
   {
@@ -60,7 +60,7 @@
     "deliverable": "Webhook spec + retry rule",
     "dependency": "P0-02",
     "critical": true,
-    "status": "Planned",
+    "status": "In Progress",
     "progress": 0
   },
   {
@@ -72,7 +72,7 @@
     "deliverable": "Security freeze (auth, token, IP, signature)",
     "dependency": "P0-01",
     "critical": true,
-    "status": "Planned",
+    "status": "In Progress",
     "progress": 33
   },
   {
@@ -110,7 +110,7 @@
     "deliverable": "Endpoint + logic READY + error codes",
     "dependency": "M0",
     "critical": true,
-    "status": "Planned",
+    "status": "In Progress",
     "progress": 10
   },
   {
