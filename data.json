@@ -37,7 +37,7 @@
     "dependency": "P0-02",
     "critical": true,
     "status": "In Progress",
-    "progress": 23
+    "progress": 87
   },
   {
     "id": "P0-04",
@@ -49,7 +49,7 @@
     "dependency": "P0-02",
     "critical": true,
     "status": "In Progress",
-    "progress": 0
+    "progress": 90
   },
   {
     "id": "P0-05",
@@ -61,7 +61,7 @@
     "dependency": "P0-02",
     "critical": true,
     "status": "In Progress",
-    "progress": 0
+    "progress": 91
   },
   {
     "id": "P0-06",
@@ -73,7 +73,7 @@
     "dependency": "P0-01",
     "critical": true,
     "status": "In Progress",
-    "progress": 33
+    "progress": 45
   },
   {
     "type": "milestone",
@@ -111,7 +111,7 @@
     "dependency": "M0",
     "critical": true,
     "status": "In Progress",
-    "progress": 10
+    "progress": 35
   },
   {
     "id": "P1-SNP-03",
@@ -122,8 +122,8 @@
     "deliverable": "Endpoint nhận CheckinId + trả result",
     "dependency": "P1-SNP-01",
     "critical": true,
-    "status": "Planned",
-    "progress": 0
+    "status": "In Progress",
+    "progress": 54
   },
   {
     "id": "P1-SNP-04",
