@@ -36,15 +36,15 @@
     "deliverable": "Field mapping table v1.0",
     "dependency": "P0-02",
     "critical": true,
-    "status": "In Progress",
-    "progress": 87
+    "status": "Done",
+    "progress": 100
   },
   {
     "id": "P0-04",
     "name": "Chốt Error Code Catalog",
     "owner": "SNP",
     "start": "2026-02-23",
-    "end": "2026-02-26",
+    "end": "2026-03-03",
     "deliverable": "Error code catalog v1.0",
     "dependency": "P0-02",
     "critical": true,
@@ -60,8 +60,8 @@
     "deliverable": "Webhook spec + retry rule",
     "dependency": "P0-02",
     "critical": true,
-    "status": "In Progress",
-    "progress": 91
+    "status": "Done",
+    "progress": 100
   },
   {
     "id": "P0-06",
