@@ -110,8 +110,8 @@
     "deliverable": "Endpoint + logic READY + error codes",
     "dependency": "M0",
     "critical": true,
-    "status": "In Progress",
-    "progress": 35
+    "status": "Done",
+    "progress": 100
   },
   {
     "id": "P1-SNP-03",
@@ -122,8 +122,8 @@
     "deliverable": "Endpoint nhận CheckinId + trả result",
     "dependency": "P1-SNP-01",
     "critical": true,
-    "status": "In Progress",
-    "progress": 20
+    "status": "Done",
+    "progress": 100
   },
   {
     "id": "P1-SNP-04",
@@ -134,8 +134,8 @@
     "deliverable": "Endpoint update theo CheckinId",
     "dependency": "P1-SNP-03",
     "critical": true,
-    "status": "Planned",
-    "progress": 0
+    "status": "Done",
+    "progress": 100
   },
   {
     "id": "P1-SNP-05",
@@ -170,8 +170,8 @@
     "deliverable": "—",
     "dependency": "",
     "critical": false,
-    "status": "Planned",
-    "progress": 0
+    "status": "Done",
+    "progress": 100
   },
   {
     "id": "P1-SNP-008",
@@ -182,8 +182,8 @@
     "deliverable": "—",
     "dependency": "",
     "critical": false,
-    "status": "Planned",
-    "progress": 0
+    "status": "In Progress",
+    "progress": 41
   },
   {
     "id": "P1-SNP-009",
